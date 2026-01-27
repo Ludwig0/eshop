@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}商品列表{% endblock %}
+{% block content %}
+
+<div class="row g-3">
+  <div class="col-lg-3">
+    <div class="card">
+      <div class="card-body">
+        <form method="get" class="mb-3">
+          <input name="q" value="{{ q }}" class="form-control" placeholder="搜索商品...">
+        </form>
+
+        <div class="list-group">
+          <a class="list-group-item {% if not category %}active{% endif %}" href="{% url 'product_list' %}">全部</a>
+          {% for c in categories %}
+            <a class="list-group-item {% if category and category.id == c.id %}active{% endif %}"
+               href="{% url 'product_list_by_category' c.slug %}">
+              {{ c.name }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9">
+    <div class="row g-3">
+      {% for p in page.object_list %}
+        <div class="col-md-4">
+          <div class="card h-100">
+            {% if p.image_url %}
+              <img src="{{ p.image_url }}" class="card-img-top" style="object-fit:cover;height:180px;">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ p.name }}</h5>
+              <div class="text-muted small">库存：{{ p.stock }}</div>
+              <div class="fw-bold mt-2">￥{{ p.price }}</div>
+              <a class="btn btn-sm btn-primary mt-2" href="{% url 'product_detail' p.slug %}">查看详情</a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12"><div class="alert alert-warning">暂无商品</div></div>
+      {% endfor %}
+    </div>
+
+    <nav class="mt-4">
+      <ul class="pagination">
+        {% if page.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}&q={{ q }}">上一页</a></li>
+        {% endif %}
+        <li class="page-item disabled"><span class="page-link">{{ page.number }} / {{ page.paginator.num_pages }}</span></li>
+        {% if page.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}&q={{ q }}">下一页</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+</div>
+
+{% endblock %}

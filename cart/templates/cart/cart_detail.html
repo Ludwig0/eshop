@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}购物车{% endblock %}
+{% block content %}
+
+<h3>购物车</h3>
+
+{% if cart.total_qty == 0 %}
+  <div class="alert alert-info">购物车为空</div>
+{% endif %}
+
+<div class="list-group">
+  {% for item in cart %}
+    <div class="list-group-item">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <div class="fw-bold">{{ item.product.name }}</div>
+          <div class="text-muted small">单价：￥{{ item.product.price }} · 小计：￥{{ item.line_total }}</div>
+        </div>
+        <div class="d-flex gap-2">
+          <form method="post" action="{% url 'cart_update' item.product.id %}" class="d-flex gap-2">
+            {% csrf_token %}
+            <input type="number" name="qty" value="{{ item.qty }}" min="1" class="form-control" style="max-width:120px;">
+            <button class="btn btn-outline-secondary">更新</button>
+          </form>
+          <a class="btn btn-outline-danger" href="{% url 'cart_remove' item.product.id %}">移除</a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+  <div class="fs-5">合计：￥{{ cart.total_price }}</div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-danger" href="{% url 'cart_clear' %}">清空</a>
+    <a class="btn btn-primary" href="{% url 'checkout' %}">去结算</a>
+  </div>
+</div>
+
+{% endblock %}

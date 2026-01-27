@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+
+<div class="row g-4">
+  <div class="col-md-5">
+    {% if product.image_url %}
+      <img src="{{ product.image_url }}" class="img-fluid rounded border">
+    {% else %}
+      <div class="border rounded p-5 text-muted">暂无图片</div>
+    {% endif %}
+  </div>
+
+  <div class="col-md-7">
+    <h2>{{ product.name }}</h2>
+    <div class="text-muted">库存：{{ product.stock }}</div>
+    <div class="fs-4 fw-bold mt-2">￥{{ product.price }}</div>
+    <p class="mt-3">{{ product.description|linebreaks }}</p>
+
+    <form method="post" action="{% url 'cart_add' product.id %}" class="d-flex gap-2">
+      {% csrf_token %}
+      <input type="number" name="qty" value="1" min="1" class="form-control" style="max-width:120px;">
+      <button class="btn btn-primary" {% if product.stock == 0 %}disabled{% endif %}>加入购物车</button>
+    </form>
+
+    <hr class="my-4">
+
+    <h5>评分：{% if avg_rating %}{{ avg_rating|floatformat:1 }}/5{% else %}暂无{% endif %}</h5>
+
+    <div class="mt-3">
+      <h6>评价列表</h6>
+      {% for r in reviews %}
+        <div class="border rounded p-3 mb-2">
+          <div class="small text-muted">{{ r.user.username }} · {{ r.created_at }}</div>
+          <div>评分：{{ r.rating }} / 5</div>
+          <div>{{ r.comment|linebreaks }}</div>
+        </div>
+      {% empty %}
+        <div class="text-muted">还没有评价</div>
+      {% endfor %}
+    </div>
+
+    <div class="mt-4">
+      <h6>写评价</h6>
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'upsert_review' product.id %}">
+          {% csrf_token %}
+          <div class="mb-2">
+            <label class="form-label">评分（1-5）</label>
+            <input name="rating" value="{{ review_form.rating.value|default:5 }}" type="number" min="1" max="5" class="form-control" style="max-width:160px;">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">内容</label>
+            <textarea name="comment" class="form-control" rows="3">{{ review_form.comment.value|default:"" }}</textarea>
+          </div>
+          <button class="btn btn-outline-primary">提交</button>
+        </form>
+      {% else %}
+        <div class="text-muted">登录后可评价</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}我的订单{% endblock %}
+{% block content %}
+<h3>我的订单</h3>
+
+<div class="list-group">
+  {% for o in orders %}
+    <a class="list-group-item list-group-item-action" href="{% url 'order_detail' o.id %}">
+      <div class="d-flex justify-content-between">
+        <div>订单 #{{ o.id }} · {{ o.created_at }}</div>
+        <div class="text-muted">{{ o.get_status_display }}</div>
+      </div>
+    </a>
+  {% empty %}
+    <div class="alert alert-info">暂无订单</div>
+  {% endfor %}
+</div>
+
+{% endblock %}

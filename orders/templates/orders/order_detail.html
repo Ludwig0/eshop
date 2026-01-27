@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}订单 #{{ order.id }}{% endblock %}
+{% block content %}
+<h3>订单 #{{ order.id }}</h3>
+<div class="text-muted">状态：{{ order.get_status_display }} · 创建：{{ order.created_at }}</div>
+
+<div class="card mt-3">
+  <div class="card-body">
+    <div><b>收货人：</b>{{ order.full_name }}</div>
+    <div><b>电话：</b>{{ order.phone }}</div>
+    <div><b>地址：</b>{{ order.address }}</div>
+    {% if order.note %}<div><b>备注：</b>{{ order.note }}</div>{% endif %}
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-body">
+    <h6 class="text-muted">商品</h6>
+    <ul class="list-group list-group-flush">
+      {% for i in order.items.all %}
+        <li class="list-group-item d-flex justify-content-between">
+          <span>{{ i.product.name }} x {{ i.quantity }}</span>
+          <span>￥{{ i.unit_price }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}
